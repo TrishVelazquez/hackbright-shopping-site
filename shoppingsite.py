@@ -76,7 +76,20 @@ def show_shopping_cart():
     # Make sure your function can also handle the case wherein no cart has
     # been added to the session
 
-    return render_template("cart.html")
+    # session["cart"]
+    list_melons = []
+    total_cost = 0
+
+    for melon_id in session["cart"]:
+        new_melon = melons.get_by_id(melon_id) # insantiating Melon object
+        melon_qty = session["cart"][melon_id]
+        melon_total = new_melon.price * melon_qty # subtotal
+        new_melon.qty = melon_qty
+        new_melon.total = melon_total
+        list_melons.append(new_melon)
+        total_cost += melon_total
+
+    return render_template("cart.html", melons= list_melons, total_cost=total_cost)
 
 # app = Flask(__name__)
 # app.secret_key = "secret"
@@ -95,7 +108,7 @@ def add_to_cart(melon_id):
     cart'."""
 
     if "cart" in session:
-        if session["cart"][melon_id]:
+        if session["cart"].get(melon_id):
             session["cart"][melon_id] += 1
         else:
             session["cart"][melon_id] = 1
